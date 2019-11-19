@@ -3,8 +3,7 @@
 #图片
 
 #one
-![Image_text](.images/one.png)
+![Image text](./images/one.png)
 #two
-![Image_text](.images/tow.png)
-
+![Image text](./images/tow.png)
 
