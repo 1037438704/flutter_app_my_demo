@@ -1,0 +1,53 @@
+buildscript {
+    ext.kotlin_version = '1.2.71'
+    repositories {
+        google()
+        jcenter()
+        maven {
+            name "jcenter-proxy"
+            url "http://maven.manwei.com/nexus/content/repositories/jcenter/"
+        }
+    }
+
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.2.1'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+    }
+}
+
+allprojects {
+    repositories {
+        google()
+        jcenter()
+
+        mavenLocal()
+        maven {
+            name "release"
+            url "http://maven.manwei.com/nexus/content/repositories/releases/"
+        }
+        maven {
+            name "jcenter-proxy"
+            url "http://maven.manwei.com/nexus/content/repositories/jcenter/"
+        }
+        maven {
+            name "jitpack"
+            url "http://maven.manwei.com/nexus/content/repositories/jit-pack/"
+        }
+        maven {
+            name "aliyun"
+            url "http://maven.aliyun.com/nexus/content/repositories/jcenter"
+        }
+    }
+}
+
+rootProject.buildDir = '../build'
+subprojects {
+    project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
+    project.evaluationDependsOn(':app')
+}
+
+task clean(type: Delete) {
+    delete rootProject.buildDir
+}
