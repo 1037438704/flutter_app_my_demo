@@ -1,100 +1,75 @@
-import 'package:flutter/material.dart';
-
 import 'dart:async';
+import 'dart:io';
 
-import 'package:jpush_flutter/jpush_flutter.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_app_push/pages/FileReadPage.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'data/common.dart';
+import 'data/modify_path_provider.dart';
 
-void main() => runApp(MyApp());
+void main() {
 
-class MyApp extends StatefulWidget {
-  @override
-  _MyAppState createState() => new _MyAppState();
+  WidgetsFlutterBinding.ensureInitialized();
+  Future<void> getSDCardDir() async {
+    Common().sDCardDir = (await getExternalStorageDirectory()).path;
+  }
+
+//   Permission check
+  Future<void> getPermission() async {
+    if (Platform.isAndroid) {
+      PermissionStatus permission = await PermissionHandler()
+          .checkPermissionStatus(PermissionGroup.storage);
+      if (permission != PermissionStatus.granted) {
+        await PermissionHandler().requestPermissions([PermissionGroup.storage]);
+      }
+      await getSDCardDir();
+    } else if (Platform.isIOS) {
+      await getSDCardDir();
+    }
+  }
+  Future.wait([initializeDateFormatting("zh_CN", null), getPermission()]).then((
+      result) {
+    runApp(MyApp());
+  });
 }
 
-class _MyAppState extends State<MyApp> {
-  String debugLable = 'Unknown';
-  final JPush jPush = new JPush();
-
-  @override
-  void initState() {
-    super.initState();
-    // 配置jpush(不要省略）
-    jPush.setup(
-        appKey: "b871d045492eb2901c80dfef",
-        channel: '9b3ee30496789dbda89444f3');
-    initPlatformState().then((value) {});
-    // 监听jpush
-//    jPush.addEventHandler(
-//      onReceiveNotification: (Map<String, dynamic> message) async {
-//        print("flutter 接收到推送: $message");
-//      },
-//      onOpenNotification: (Map<String, dynamic> message) {
-//        // 点击通知栏消息，在此时通常可以做一些页面跳转等
-//      },
-//    );
-  }
-
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    try {
-      jPush.addEventHandler(
-        onReceiveNotification: (Map<String, dynamic> message) async {
-          print('>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>flutter 接受到推送信息${message}');
-          debugLable = '接收到推送：${message}';
-        },
-        onOpenNotification: (Map<String, dynamic> message) {
-       // 点击通知栏消息，在此时通常可以做一些页面跳转等
-        },
-      );
-    } on Exception {
-      platformVersion = '平台版本获取失败，请检查!';
-    }
-    if (!mounted) return;
-    setState(() {
-      debugLable = platformVersion;
-    });
-  }
-
+class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: MaterialApp(
-        home: Scaffold(
-          appBar: AppBar(
-            title: Text('极光推送'),
-          ),
-          body: Center(
-            child: Column(
-              children: <Widget>[
-                Text('结果:${debugLable}'),
-                FlatButton(
-                  child: Text('发送推送信息'),
-                  onPressed: () {
-                    var fireDate = DateTime.fromMillisecondsSinceEpoch(
-                        DateTime.now().millisecondsSinceEpoch);
-                    var localNotification = LocalNotification(
-                      id: 234,
-                      title: '测试本地推送',
-                      buildId: 1,
-                      content: '我是本地推送的消息',
-                      fireTime: fireDate,
-                      subtitle: 'ios 消息推送',
-                      // 该参数只有在 iOS 有效
-                      badge: 5, // 该参数只有在 iOS 有效
-//                      extra: {"fa": "0"} // 设置 extras ，extras 需要是 Map<String, String>
-                    );
-                    jPush.sendLocalNotification(localNotification).then((res) {
-                      setState(() {
-                        debugLable = res;
-                      });
-                    });
-                  },
-                )
-              ],
-            ),
-          ),
-        ),
+    return MaterialApp(
+      title: "Flutter File Manager",
+      theme: ThemeData(
+//          platform: TargetPlatform.iOS,
+          primarySwatch: Colors.red
       ),
+      home: HomeApp(),
     );
   }
 }
+
+class HomeApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(title: Text("选择"),),
+      body: Column(
+        children: <Widget>[
+          MaterialButton(
+            child: Text("mp3"),
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(builder: (context) => FileReadPage()));
+            },
+          )
+        ],
+      ),
+    );
+  }
+
+}
+
+
+
+
