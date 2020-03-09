@@ -17,7 +17,7 @@ class Common {
 
   Common._internal();
 
-  String sDCardDir = "/storage/emulated/0";
+  String sDCardDir;
 
   String getFileSize(int fileSize) {
     String str = '';
