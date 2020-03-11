@@ -9,14 +9,15 @@ class FileReadViewModel extends ChangeNotifier {
 
   initView() {
     files.clear();
-    initPathFiles(Common().sDCardDir).then((value) {
-      print("====我拿到了====${value.length}");
-      notifyListeners();
-    });
+    initPathFiles(Common().sDCardDir);
+//    initPathFiles(Common().sDCardDir).then((value) {
+//      print("====我拿到了====${value.length}");
+//      notifyListeners();
+//    });
   }
 
   // 初始化该路径下的文件、文件夹
-  Future<List<FileSystemEntity>> initPathFiles(String path) async {
+  initPathFiles(String path) async {
     List<FileSystemEntity> pathFiles = [];
     try {
       //目前我已经有了集合所有文件或者文件夹的集合
@@ -26,28 +27,15 @@ class FileReadViewModel extends ChangeNotifier {
         if (p.basename(v.path).substring(0, 1) == '.') {
           continue;
         }
-        print("=========正在筛选===========");
         if (FileSystemEntity.isFileSync(v.path)) {
           if (p.extension(v.path) == ".mp3") {
-            pathFiles.add(v);
-            pathFiles.sort(
+            files.add(v);
+            files.sort(
                 (a, b) => a.path.toLowerCase().compareTo(b.path.toLowerCase()));
-            if (pathFiles.length == 1) {
-              print("=========${path.length}===========");
-              return pathFiles;
-            }
-            if (pathFiles.length == 5) {
-              return pathFiles;
-            }
-          }
-        } else {
-          if (1024 <= v.statSync().size) {
-            initPathFiles(v.path);
-            print("========进来了===============${v.path}");
           }
         }
       }
-      return pathFiles;
+      notifyListeners();
     } catch (e) {
       print(e);
       print("Directory does not exist！");

@@ -3,8 +3,7 @@ import 'package:provider/provider.dart';
 /// 
 /// 2019.12.9
 /// 
-/// 周发洪
-/// 
+///
 /// Provider封装类(在需要状态管理的时候使用) --- 方便数据初始化
 class ProviderWidget<T extends ChangeNotifier> extends StatefulWidget {
   final ValueWidgetBuilder<T> builder;
